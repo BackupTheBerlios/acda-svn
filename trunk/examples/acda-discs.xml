@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<acda-discs>
+    <disc number="1" title="Documents 1">
+        <choice id="Category">4</choice>
+        <choice id="Medium">0</choice>
+        <AddingDate>1129122831</AddingDate>
+        <ModifiedDate>1129122847</ModifiedDate>
+        <Scanned>1</Scanned>
+        <ByteSize>651013210</ByteSize>
+        <NumberOfFiles>1528</NumberOfFiles>
+    </disc>
+    <disc number="2" title="Documents 2">
+        <choice id="Category">4</choice>
+        <choice id="Medium">0</choice>
+        <AddingDate>1129123121</AddingDate>
+        <ModifiedDate>1129121544</ModifiedDate>
+        <Scanned>1</Scanned>
+        <ByteSize>601099012</ByteSize>
+        <NumberOfFiles>1300</NumberOfFiles>
+    </disc>
+    <disc number="3" title="Action Movie III">
+        <choice id="Category">3</choice>
+        <choice id="Medium">1</choice>
+        <AddingDate>1129149001</AddingDate>
+        <ModifiedDate>1129150012</ModifiedDate>
+        <Scanned>0</Scanned>
+		<choice id="Rating">3</choice>
+        <number id="Discs">1</number>
+        <text id="Description">A nice action movie with a lot of shooting and stuff</text>
+        <text id="Director">Michael &lt; Woo</text>
+    </disc>
+    <disc number="4" title="Raw wars Triologie">
+        <choice id="Category">3</choice>
+        <choice id="Medium">1</choice>
+        <AddingDate>1129149001</AddingDate>
+        <ModifiedDate>1129150012</ModifiedDate>
+		<choice id="Rating">4</choice>
+		<choice id="Location">3</choice>
+        <Scanned>0</Scanned>
+        <number id="Discs">3</number>
+    </disc>
+    <disc number="5" title="Favourite songs">
+        <choice id="Category">2</choice>
+        <choice id="Medium">1</choice>
+        <AddingDate>1129124344</AddingDate>
+        <ModifiedDate>1129125352</ModifiedDate>
+        <Scanned>1</Scanned>
+        <ByteSize>6100321237</ByteSize>
+        <NumberOfFiles>130</NumberOfFiles>
+    </disc>
+</acda-discs>

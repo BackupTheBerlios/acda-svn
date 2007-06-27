@@ -1,0 +1,4 @@
+
+Next:
+	- ChoiceType wird von der Database hinzugefügt
+	- ACDA::Database schreiben

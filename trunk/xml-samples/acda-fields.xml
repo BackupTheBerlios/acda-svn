@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="ISO-8859-15" ?>
+<!-- Please note that all your comments in this file might get lost -->
+<acda-fields>
+<!-- Tags hinzufügen -->
+	<types>
+    	<choice id="Category" default="5">
+    	    <entry name="Movies"/>
+    	    <entry name="Pictures"/>
+    	    <entry name="Music"/>
+    	    <entry name="Programms"/>
+    	    <entry name="Documents"/>
+    	    <entry name="None"/>
+    	</choice>
+    	<choice id="Medium" default="0">
+    	    <entry name="CD"/>
+    	    <entry name="DVD"/>
+    	    <entry name="HDD"/>
+    	</choice>
+    	<choice id="Location">
+    	    <entry name="Unknown"/>
+    	    <entry name="Joe Miller"/>
+    	    <entry name="Floor"/>
+    	    <entry name="CD Case 2"/>
+    	    <entry name="CD Case 1"/>
+    	    <entry name="Table drawer"/>
+    	    <entry name="Shelf above the bed"/>
+    	</choice>
+    	<choice id="Rating" default="0">
+    	    <entry name="-"/>
+    	    <entry name="Bad"/>
+    	    <entry name="Average"/>
+    	    <entry name="Good"/>
+    	    <entry name="Super"/>
+    	</choice>
+    	<number id="Discs" default="1"/>
+    	<text id="Description" default=""/>
+	</types>
+	<views>
+		<view id="default">
+   		     <field id="Number" display="#"/>
+   		     <field id="Title"/>
+   		     <field id="Category"/>
+   		     <field id="Medium"/>
+   		     <field id="AddingDate"/>
+   		     <field id="Scanned"/>
+   		     <sort id="Number" type="ascending"/>
+		</view>
+		<view id="extended">
+   		     <field id="Number"/>
+   		     <field id="Title"/>
+   		     <field id="Category"/>
+   		     <field id="Medium"/>
+   		     <field id="AddingDate"/>
+   		     <field id="Scanned"/>
+   		     <field id="Rating"/>
+   		     <field id="Location"/>
+   		     <field id="Discs" display="Number of Discs"/>
+   		     <sort id="Title" type="ascending"/>
+   		     <sort id="AddingDate" type="descending"/>
+   		 </view>
+	</views>
+</acda-fields>
