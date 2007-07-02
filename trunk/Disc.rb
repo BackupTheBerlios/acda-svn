@@ -33,6 +33,31 @@ class Disc
 		@values.push OptionalValue.new(type, value)
 	end
 
+    def get_value(id)
+        case id
+            when "Number"
+                return @number
+            when "Title"
+                return @title
+            when "AddingDate"
+                return @addingDate
+            when "ModifiedDate"
+                return @modifiedDate
+            when "Scanned"
+                return @scanned
+            when "BytesSize"
+                return @bytesSize
+            when "NumberOfFiles"
+                return @numberOfFiles
+            else
+                @values.each { |optval|
+                    return optval.display_value if optval.type.id == id
+                    # TODO correct?
+                }
+                raise ArgumentError, "No value with id '#{id}' found."
+        end
+    end
+
 	def clearValues
 		@values.clear
 	end

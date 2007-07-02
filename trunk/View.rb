@@ -26,24 +26,24 @@ class View
 
 	def field_names()
 		ret = Array.new
-		i = 0
-		while i < @fields.length do
-			ret.push(@fields[i])
-			i += 2
-		end
+        @fields.each { |field|
+			ret.push(field[0])
+        }
+
+        return ret
 	end
 
 	def field_displays()
 		ret = Array.new
-		i = 0
-		while i < @fields.length do
-			if @fields[i + 1].nil?
-				ret.push(@fields[i])
+        @fields.each { |field|
+			if field[1].nil?
+				ret.push(field[0])
 			else
-				ret.push(@fields[i + 1])
+				ret.push(field[1])
 			end
-			i += 2
-		end
+        }
+
+        return ret
 	end
 
 	def push_field(id, display)
@@ -77,4 +77,15 @@ class View
 	def move_sort(pos, rel)
 		@sorts[pos + rel, 0] = @sorts.delete_at(pos)
 	end
+
+    def process(discs)
+        discs.each { |disc|
+            # TODO field sorting
+            disc_field = Array.new
+            @fields.each { |field|
+                disc_field << disc.get_value(field[0])
+            }
+            yield disc_field
+        }
+    end
 end

@@ -36,6 +36,18 @@ def get_types()
     return @storage.getTypes()
 end
 
+def get_views()
+    return @storage.getViews()
+end
+
+def default_view()
+    return @storage.getViews()['default']
+end
+
+def get_discs()
+    return @storage.getDiscs()
+end
+
 # README maybe use this as a library thing to be used by cli and gui
 
 end
