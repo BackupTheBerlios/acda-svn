@@ -10,9 +10,8 @@ class OptionalValue
 		@value = (value) ? value : type.default
 	end
 
-	def display_value()
-        # TODO implement
-		@value
+	def to_s()
+		@value.to_s
 	end
 
 	def <=>(other)

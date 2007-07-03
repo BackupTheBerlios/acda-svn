@@ -29,8 +29,8 @@ class Disc
 		@modifiedDate = Time.now
 	end
 
-	def addValue(type, value)
-		@values.push OptionalValue.new(type, value)
+	def addValue(value)
+		@values << value
 	end
 
     def get_value(id)
@@ -51,7 +51,7 @@ class Disc
                 return @numberOfFiles
             else
                 @values.each { |optval|
-                    return optval.display_value if optval.type.id == id
+                    return optval if optval.type.id == id
                     # TODO correct?
                 }
                 raise ArgumentError, "No value with id '#{id}' found."

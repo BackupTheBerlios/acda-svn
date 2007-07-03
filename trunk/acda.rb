@@ -67,8 +67,8 @@ when 'list'
     puts view.inspect
     puts view.field_displays.join(' ')
     puts "-" * 60
-    view.process(client.get_discs) { |disc|
-        puts disc.join(' ')
+    view.process(client.get_discs) { |fields|
+        puts fields.join(' ')
     }
 when 'show'
 when 'search'

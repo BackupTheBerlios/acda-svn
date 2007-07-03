@@ -6,7 +6,11 @@ class ChoiceValue < OptionalValue
 		super
 	end
 
+    def to_s()
+        type.choices[value]
+    end
+
 	def <=>(other)
-		type.pos[value] <=> other.type.pos[other.value]
+		value <=> other.value
 	end
 end

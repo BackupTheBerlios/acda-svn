@@ -8,6 +8,8 @@ require 'Repository.rb'
 require 'View.rb'
 require 'Disc.rb'
 require 'OptionalTypes.rb'
+require 'OptionalValue.rb'
+require 'ChoiceValue.rb'
 
 class XMLRepository < Repository
 include REXML
@@ -227,13 +229,14 @@ def parseDisc(elem, types = getTypes)
 			# optional types
 			when 'choice'
 				type = types[sub.attributes['id']]
-				disc.addValue(type, sub.text.to_i)
+                # factory oder so fuer values
+				disc.addValue(ChoiceValue.new(type, sub.text.to_i))
 			when 'number'
 				type = types[sub.attributes['id']]
-				disc.addValue(type, sub.text.to_i)
+				disc.addValue(OptionalValue.new(type, sub.text.to_i))
 			when 'text'
 				type = types[sub.attributes['id']]
-				disc.addValue(type, sub.text)
+				disc.addValue(OptionalValue.new(type, sub.text))
 		end
 	}
 	disc
