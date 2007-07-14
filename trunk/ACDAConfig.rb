@@ -1,6 +1,7 @@
 
 require 'ACDA.rb'
 require 'fileutils.rb'
+require 'exceptions.rb'
 
 class ACDAConfig
 	attr_reader :path
@@ -32,7 +33,7 @@ class ACDAConfig
 				value.strip!
 
 				unless @keys.include?(key)
-					raise RuntimeError, "Unknown key #{key} in config file"
+					raise ParseError, "Unknown key #{key} in config file"
 				end
 
 				@values[key] = value
@@ -43,7 +44,12 @@ class ACDAConfig
 	end
 
 	def createDefaultConfig(path)
-		FileUtils.copy(ACDA.acda_home + "/examples/acda.cfg", path)
+        default=ACDA.acda_home + '/examples/acda.cfg'
+        unless File.file?(default)
+            raise FileNotFoundError, "Could not find default config "+
+                                     "file '#{default}'\n"
+        end
+		FileUtils.copy(ACDA.acda_home + '/examples/acda.cfg', path)
 	end
 end
 

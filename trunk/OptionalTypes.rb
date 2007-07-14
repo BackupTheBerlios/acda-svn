@@ -1,12 +1,16 @@
 
 class OptionalType
-	attr_reader :id, :default, :type_name
+	attr_reader :default, :type_name
 
 	def initialize(id, type_name, default)
 		@id = id
 		@type_name = type_name
 		@default = default
 	end
+
+    def get_id()
+        return @id
+    end
 end
 
 class StringType < OptionalType

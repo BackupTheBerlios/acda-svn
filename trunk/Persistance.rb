@@ -25,6 +25,11 @@ def self.register(definition)
 end
 
 def self.load_plugins(plugins_dir)
+    unless File.directory?(plugins_dir)
+        raise ArgumentError, "Plugin path '#{plugins_dir}' is not existing or "+
+                             "not a directory."
+    end
+
 	Dir[plugins_dir + "/*.rb"].each do |pluginfile|
 		load pluginfile
 	end

@@ -10,6 +10,7 @@ require 'Disc.rb'
 require 'OptionalTypes.rb'
 require 'OptionalValue.rb'
 require 'ChoiceValue.rb'
+require 'exceptions.rb'
 
 class XMLRepository < Repository
 include REXML
@@ -82,7 +83,7 @@ def getTypes()
 					number = NumberType.new(elem.attributes["id"])
 				end
 
-				types[number.id] = number
+				types[number.get_id] = number
 
 			when "text"
 				string = nil
@@ -93,7 +94,7 @@ def getTypes()
 					string = StringType.new(elem.attributes["id"])
 				end
 
-				types[string.id] = string
+				types[string.get_id] = string
 
 			when "choice"
 				choices = Array.new
@@ -106,7 +107,7 @@ def getTypes()
 										  choices,
 										  elem.attributes["default"])
 
-			 	types[choice.id] = choice
+			 	types[choice.get_id] = choice
 			else
 				raise RuntimeError, "Unknown optional type #{elem.name}"
 		end
@@ -172,7 +173,7 @@ def getViews()
 				  sort.attributes['type'] == 'dsc'
 			   type = View.DESCENDING
 			else
-				raise RuntimeError, "Unknown sort type %s" % sort.attributes['type']
+				raise ParseError, "Unknown sort type %s" % sort.attributes['type']
 			end
 
 			view.push_sort(sort.attributes['id'], type)
@@ -219,8 +220,9 @@ def parseDisc(elem, types = getTypes)
 				elsif val == '0' or val == 'false'
 					disc.scanned = false
 				else
-					raise RuntimeError, "Unkown value %s for disc %d element Scanned" %
-										disc.number, val
+					raise RuntimeError,
+                        "Unkown value %s for disc %d element Scanned" % 
+                        disc.number, val
 				end
 			when 'NumberOfFiles'
 				disc.numberOfFiles = sub.get_text.value.to_i
@@ -229,13 +231,22 @@ def parseDisc(elem, types = getTypes)
 			# optional types
 			when 'choice'
 				type = types[sub.attributes['id']]
+                unless type
+                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
+                end
                 # factory oder so fuer values
 				disc.addValue(ChoiceValue.new(type, sub.text.to_i))
 			when 'number'
 				type = types[sub.attributes['id']]
-				disc.addValue(OptionalValue.new(type, sub.text.to_i))
+                unless type
+                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
+                end
+                disc.addValue(OptionalValue.new(type, sub.text.to_i))
 			when 'text'
 				type = types[sub.attributes['id']]
+                unless type
+                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
+                end
 				disc.addValue(OptionalValue.new(type, sub.text))
 		end
 	}

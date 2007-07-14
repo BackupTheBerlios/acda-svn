@@ -22,7 +22,7 @@ class Disc
 		@addingDate   = Time.now if not @addingDate
 		@modifiedDate = Time.now if not @modifiedDate
 
-		@values = []
+		@values = Hash.new
 	end
 
 	def modified
@@ -30,7 +30,15 @@ class Disc
 	end
 
 	def addValue(value)
-		@values << value
+        if value.class == "Array"
+            puts "ADFASFAHSDFASFDASFD "+ value.inspect
+            raise RuntimeError
+        end
+        if value == nil
+            puts "ADFASFAHSDFASFDASFD "+ value.inspect
+            raise RuntimeError
+        end
+		@values[value.get_type.get_id] = value
 	end
 
     def get_value(id)
@@ -50,11 +58,10 @@ class Disc
             when "NumberOfFiles"
                 return @numberOfFiles
             else
-                @values.each { |optval|
-                    return optval if optval.type.id == id
-                    # TODO correct?
-                }
-                raise ArgumentError, "No value with id '#{id}' found."
+                unless @values[id]
+                    raise ArgumentError, "No value with id '#{id}' found." 
+                end
+                return @values[id]
         end
     end
 

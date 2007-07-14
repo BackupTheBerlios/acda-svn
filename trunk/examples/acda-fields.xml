@@ -32,6 +32,7 @@
     	</choice>
     	<number id="Discs" default="1"/>
     	<text id="Description" default=""/>
+    	<text id="Director" default=""/>
 	</types>
 	<views>
 		<view id="default">

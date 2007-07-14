@@ -1,16 +1,47 @@
 
-class View
-	attr_reader :id, :fields, :sorts
-
+class StableSort
 	@@ASCENDING  = 0
 	@@DESCENDING = 1
 
-	def View.ASCENDING
+	def self.ASCENDING
 		@@ASCENDING
 	end
 
-	def View.DESCENDING
+	def self.DESCENDING
 		@@DESCENDING
+	end
+
+    attr_accessor :id, :type
+
+    def initialize(name, type = @@ASCENDING)
+        @id   = name
+        @type = type
+
+        if type != @@ASCENDING and type != @@DESCENDING
+            raise ArgumentError, "Sort type must be either ascending "+
+                                 "or descending.\n"
+        end
+    end
+
+    def do(elements)
+        if type == @@ASCENDING
+            elements.sort! { |a,b| a.get_value(@id) <=> b.get_value(@id) }
+        
+        else
+            elements.sort! { |b,a| a.get_value(@id) <=> b.get_value(@id) }
+        end
+    end
+end
+
+class View
+	attr_reader :id, :fields, :sorts
+
+	def self.ASCENDING
+		StableSort.ASCENDING
+	end
+
+	def self.DESCENDING
+		StableSort.DESCENDING
 	end
 
 	def initialize(id)
@@ -62,12 +93,14 @@ class View
 		@fields[pos + rel, 0] = @fields.delete_at(pos)
 	end
 
-	def push_sort(id, type = @@ASCENDING)
-		@sorts.push([id, type])
+	def push_sort(id, type)
+        raise ArgumentError, "Id must not be nil" unless id
+		@sorts.push(StableSort.new(id, type))
 	end
 
-	def add_sort(pos, id, type = @@ASCENDING)
-		@sorts[pos, 0] = [id, type]
+	def add_sort(pos, id, type)
+        raise ArgumentError, "Id must not be nil" unless id
+		@sorts[pos, 0] = StableSort.new(id, type)
 	end
 
 	def del_sort(pos)
@@ -79,13 +112,19 @@ class View
 	end
 
     def process(discs)
+        sort(discs)
         discs.each { |disc|
-            # TODO field sorting
             disc_field = Array.new
             @fields.each { |field|
                 disc_field << disc.get_value(field[0])
             }
             yield disc_field
+        }
+    end
+
+    def sort(discs)
+        @sorts.reverse_each { |sort|
+            sort.do(discs)
         }
     end
 end

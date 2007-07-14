@@ -62,9 +62,9 @@ case action
 when 'list'
     client = ACDAClient.new
     client.load_config()
-    puts client.inspect
+  #  puts client.inspect
     view = client.default_view
-    puts view.inspect
+  #  puts view.inspect
     puts view.field_displays.join(' ')
     puts "-" * 60
     view.process(client.get_discs) { |fields|
