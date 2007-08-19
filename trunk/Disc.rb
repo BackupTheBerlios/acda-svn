@@ -16,10 +16,13 @@ class Disc
 		@bytesSize	   = bytesSize
 		@numberOfFiles = numberOfFiles
 		@scanned	   = scanned
-		@addingDate    = addingDate
-		@modifiedDate  = modifiedDate
+        if @addingDate
+		    @addingDate = Time.at(addingDate)
+        else
+		    @addingDate = Time.now
+        end
 
-		@addingDate   = Time.now if not @addingDate
+		@modifiedDate = modifiedDate
 		@modifiedDate = Time.now if not @modifiedDate
 
 		@values = Hash.new

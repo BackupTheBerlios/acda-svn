@@ -4,6 +4,7 @@ require 'ACDA.rb'
 require 'ACDAConfig.rb'
 require 'ACDAClient.rb'
 require 'Persistance.rb'
+require 'AlignPrinter.rb'
 
 require 'getoptlong'
 
@@ -65,11 +66,12 @@ when 'list'
   #  puts client.inspect
     view = client.default_view
   #  puts view.inspect
-    puts view.field_displays.join(' ')
-    puts "-" * 60
+    printer = AlignPrinter.new
+    printer.setCaptions(view.field_displays)
     view.process(client.get_discs) { |fields|
-        puts fields.join(' ')
+        printer.addLine(fields)
     }
+    printer.flush
 when 'show'
 when 'search'
 when 'add'

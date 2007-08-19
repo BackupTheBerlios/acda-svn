@@ -1,4 +1,5 @@
 
+require 'ftools'
 require 'ACDA.rb'
 require 'fileutils.rb'
 require 'exceptions.rb'
@@ -44,12 +45,17 @@ class ACDAConfig
 	end
 
 	def createDefaultConfig(path)
+        return if File.file?(path)
+
         default=ACDA.acda_home + '/examples/acda.cfg'
         unless File.file?(default)
             raise FileNotFoundError, "Could not find default config "+
                                      "file '#{default}'\n"
         end
-		FileUtils.copy(ACDA.acda_home + '/examples/acda.cfg', path)
+        unless File.directory?(File.dirname(path))
+            File.makedirs(File.dirname(path))
+        end
+		FileUtils.copy(default, path)
 	end
 end
 
