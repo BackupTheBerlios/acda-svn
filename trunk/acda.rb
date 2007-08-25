@@ -61,10 +61,15 @@ end
 
 case action
 when 'list'
+    begin
     client = ACDAClient.new
     client.load_config()
   #  puts client.inspect
-    view = client.default_view
+    if arguments['view']
+        view = client.get_view(arguments['view'])
+    else
+        view = client.default_view
+    end
   #  puts view.inspect
     printer = AlignPrinter.new
     printer.setCaptions(view.field_displays)
@@ -72,6 +77,9 @@ when 'list'
         printer.addLine(fields)
     }
     printer.flush
+    rescue NoSuchView => ex
+        puts ex
+    end
 when 'show'
 when 'search'
 when 'add'

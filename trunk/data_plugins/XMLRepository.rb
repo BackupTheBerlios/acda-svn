@@ -153,8 +153,9 @@ end
 
 def getViews()
 	views = Hash.new
+    types = getTypes()
 	@fields_doc.elements.each('acda-fields/views/view') { |elem|
-		view = View.new(elem.attributes['id'])
+		view = View.new(elem.attributes['id'], types)
 
 		# add fields
 		elem.elements.each('field') { |field|
@@ -179,7 +180,7 @@ def getViews()
 			view.push_sort(sort.attributes['id'], type)
 		}
 
-		views[view.id] = view
+		views[view.name] = view
 	}
 
 	views
@@ -189,7 +190,7 @@ def setView(view)
 	@fields_doc.elements.delete("acda-fields/views/view[@id='#{type.id}']")
 
 	elem = @fields_doc.elements['acda-fields/views'].add_element('view')
-	elem.attributes['id'] = view.id
+	elem.attributes['id'] = view.name
 
 	@fields_modified = true
 end
@@ -209,9 +210,9 @@ def parseDisc(elem, types = getTypes)
 		case sub.name
 			# standard attributes
 			when 'AddingDate'
-				disc.addingDate = sub.get_text.value.to_i
+				disc.addingDate = ACDADate.new(Time.at(sub.get_text.value.to_i))
 			when 'ModifiedDate'
-				disc.modifiedDate = sub.get_text.value.to_i
+				disc.modifiedDate = ACDADate.new(Time.at(sub.get_text.value.to_i))
 			when 'Scanned'
 				scanned = false
 				val = sub.get_text.value

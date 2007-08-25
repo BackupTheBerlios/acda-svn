@@ -40,6 +40,12 @@ def get_views()
     return @storage.getViews()
 end
 
+def get_view(name)
+    ret = @storage.getViews()[name]
+    raise NoSuchView, "No such view '#{name}' exists." unless ret
+    ret
+end
+
 def default_view()
     return @storage.getViews()['default']
 end

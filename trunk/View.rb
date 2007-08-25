@@ -34,7 +34,7 @@ class StableSort
 end
 
 class View
-	attr_reader :id, :fields, :sorts
+	attr_reader :name, :fields, :sorts, :types
 
 	def self.ASCENDING
 		StableSort.ASCENDING
@@ -44,8 +44,12 @@ class View
 		StableSort.DESCENDING
 	end
 
-	def initialize(id)
-		@id = id
+	def initialize(name, types)
+		@name  = name
+        @types = types
+        unless @types.size > 0
+            raise ArgumentError, "No types specified."
+        end
 
 		@fields = Array.new
 		@sorts = Array.new
@@ -77,12 +81,12 @@ class View
         return ret
 	end
 
-	def push_field(id, display)
-		@fields.push([id, display])
+	def push_field(name, display)
+		@fields.push([name, display])
 	end
 
-	def add_field(pos, id, display)
-		@fields[pos, 0] = [id, display]
+	def add_field(pos, name, display)
+		@fields[pos, 0] = [name, display]
 	end
 
 	def del_field(pos)
@@ -93,14 +97,14 @@ class View
 		@fields[pos + rel, 0] = @fields.delete_at(pos)
 	end
 
-	def push_sort(id, type)
-        raise ArgumentError, "Id must not be nil" unless id
-		@sorts.push(StableSort.new(id, type))
+	def push_sort(name, type)
+        raise ArgumentError, "name must not be nil" unless name
+		@sorts.push(StableSort.new(name, type))
 	end
 
-	def add_sort(pos, id, type)
-        raise ArgumentError, "Id must not be nil" unless id
-		@sorts[pos, 0] = StableSort.new(id, type)
+	def add_sort(pos, name, type)
+        raise ArgumentError, "name must not be nil" unless name
+		@sorts[pos, 0] = StableSort.new(name, type)
 	end
 
 	def del_sort(pos)
@@ -116,7 +120,16 @@ class View
         discs.each { |disc|
             disc_field = Array.new
             @fields.each { |field|
-                disc_field << disc.get_value(field[0])
+                begin
+                    disc_field << disc.get_value(field[0])
+                rescue NoSuchField => ex
+                    unless @types[field[0]]
+                        puts "View [#{name}]: unkown field '#{field[0]}' found."
+                        disc_field << "-"
+                    else
+                        disc_field << @types[field[0]].default
+                    end
+                end
             }
             yield disc_field
         }

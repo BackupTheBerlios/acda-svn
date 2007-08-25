@@ -1,11 +1,13 @@
 
 require 'OptionalTypes.rb'
 require 'OptionalValue.rb'
+require 'ACDADate.rb'
 
 class Disc
 	attr_accessor :number, :title,
-				  :addingDate, :modifiedDate, :scanned,
-				  :bytesSize, :numberOfFiles, :values
+				  :scanned, :bytesSize,
+                  :numberOfFiles, :values
+    attr_reader :addingDate, :modifiedDate
 	alias id number
 
 	def initialize(number, title = '', scanned = false, bytesSize = 0,
@@ -17,13 +19,13 @@ class Disc
 		@numberOfFiles = numberOfFiles
 		@scanned	   = scanned
         if @addingDate
-		    @addingDate = Time.at(addingDate)
+		    @addingDate = addingDate
         else
-		    @addingDate = Time.now
+		    @addingDate = ACDADate.new(Time.now)
         end
 
 		@modifiedDate = modifiedDate
-		@modifiedDate = Time.now if not @modifiedDate
+		@modifiedDate = ACDADate.new(Time.now) if not @modifiedDate
 
 		@values = Hash.new
 	end
@@ -33,13 +35,8 @@ class Disc
 	end
 
 	def addValue(value)
-        if value.class == "Array"
-            puts "ADFASFAHSDFASFDASFD "+ value.inspect
-            raise RuntimeError
-        end
-        if value == nil
-            puts "ADFASFAHSDFASFDASFD "+ value.inspect
-            raise RuntimeError
+        if value.class == "Array" or value == nil
+            raise RuntimeError, "Invalid type added."
         end
 		@values[value.get_type.get_id] = value
 	end
@@ -62,7 +59,7 @@ class Disc
                 return @numberOfFiles
             else
                 unless @values[id]
-                    raise ArgumentError, "No value with id '#{id}' found." 
+                    raise NoSuchField, "No field with id '#{id}' found." 
                 end
                 return @values[id]
         end
@@ -71,4 +68,18 @@ class Disc
 	def clearValues
 		@values.clear
 	end
+
+    def addingDate(date)
+        raise ArgumentError, "Invalid type, ACDADate expected" unless
+            date.is_a? ACDADate
+        @addingDate = date
+    end
+    alias addingDate= addingDate 
+
+    def modifiedDate(date)
+        raise ArgumentError, "Invalid type, ACDADate expected" unless
+            date.is_a? ACDADate
+        @modified = date
+    end
+    alias modifiedDate= modifiedDate
 end
