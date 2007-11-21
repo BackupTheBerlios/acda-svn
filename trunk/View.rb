@@ -11,11 +11,13 @@ class StableSort
 		@@DESCENDING
 	end
 
-    attr_accessor :id, :type
+    attr_accessor :by, :type
 
-    def initialize(name, type = @@ASCENDING)
-        @id   = name
+    def initialize(by, type = @@ASCENDING)
+        @by = by
         @type = type
+
+        raise ArgumentError, "Sort by must be a Type" unless by.is_a? OptionalType
 
         if type != @@ASCENDING and type != @@DESCENDING
             raise ArgumentError, "Sort type must be either ascending "+
@@ -24,12 +26,19 @@ class StableSort
     end
 
     def do(elements)
-        if type == @@ASCENDING
-            elements.sort! { |a,b| a.get_value(@id) <=> b.get_value(@id) }
-        
-        else
-            elements.sort! { |b,a| a.get_value(@id) <=> b.get_value(@id) }
-        end
+        elements.sort! { |a,b|
+            val_a = a.get_value(@by.get_id())
+            val_a = @by.default unless val_a
+
+            val_b = b.get_value(@by.get_id())
+            val_b = @by.default unless val_b
+
+            if (@type == @@ASCENDING)
+                val_a <=> val_b
+            else
+                val_b <=> val_a
+            end
+        }
     end
 end
 
@@ -97,14 +106,16 @@ class View
 		@fields[pos + rel, 0] = @fields.delete_at(pos)
 	end
 
-	def push_sort(name, type)
+	def push_sort(by, type)
         raise ArgumentError, "name must not be nil" unless name
-		@sorts.push(StableSort.new(name, type))
+        raise ArgumentError, "Sort by must be a Type" unless by.is_a? OptionalType
+		@sorts.push(StableSort.new(by, type))
 	end
 
-	def add_sort(pos, name, type)
+	def add_sort(pos, by, type)
         raise ArgumentError, "name must not be nil" unless name
-		@sorts[pos, 0] = StableSort.new(name, type)
+        raise ArgumentError, "Sort by must be a Type" unless by.is_a? OptionalType
+		@sorts[pos, 0] = StableSort.new(by, type)
 	end
 
 	def del_sort(pos)

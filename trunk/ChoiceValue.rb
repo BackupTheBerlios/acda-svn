@@ -11,6 +11,8 @@ class ChoiceValue < OptionalValue
     end
 
 	def <=>(other)
+        raise ArgumentError, "Invalid comparison." unless
+            other and other.is_a? ChoiceValue
 		@value <=> other.value
 	end
 end

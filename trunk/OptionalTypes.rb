@@ -15,12 +15,14 @@ end
 
 class StringType < OptionalType
 	def initialize(id, default = "")
+        default = OptionalValue.new(self, default)
 		super(id, "String", default)
 	end
 end
 
 class NumberType < OptionalType
 	def initialize(id, default = 0)
+        default = OptionalValue.new(self, default)
 		super(id, "Number", default)
 	end
 end
@@ -30,9 +32,12 @@ class ChoiceType < OptionalType
 
 	def initialize(id, choices, default = nil)
 		if default.nil?
-			default = choices[0]
+			default = ChoiceValue.new(self, 0)
 		elsif default =~ /^\d$/
-			default = choices[default.to_i]
+			default = ChoiceValue.new(self, default.to_i)
+        else
+            raise ArgumentError, "Invalid default argument" unless
+                default.is_a? ChoiceValue
 		end
 
 		@choices = choices

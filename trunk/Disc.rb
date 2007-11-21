@@ -7,7 +7,6 @@ class Disc
 	attr_accessor :number, :title,
 				  :scanned, :bytesSize,
                   :numberOfFiles, :values
-    attr_reader :addingDate, :modifiedDate
 	alias id number
 
 	def initialize(number, title = '', scanned = false, bytesSize = 0,
@@ -18,7 +17,7 @@ class Disc
 		@bytesSize	   = bytesSize
 		@numberOfFiles = numberOfFiles
 		@scanned	   = scanned
-        if @addingDate
+        if addingDate
 		    @addingDate = addingDate
         else
 		    @addingDate = ACDADate.new(Time.now)
@@ -35,7 +34,7 @@ class Disc
 	end
 
 	def addValue(value)
-        if value.class == "Array" or value == nil
+        if not value or value.class == "Array"
             raise RuntimeError, "Invalid type added."
         end
 		@values[value.get_type.get_id] = value
@@ -58,9 +57,9 @@ class Disc
             when "NumberOfFiles"
                 return @numberOfFiles
             else
-                unless @values[id]
-                    raise NoSuchField, "No field with id '#{id}' found." 
-                end
+#                unless @values[id]
+#                    raise NoSuchField, "No field with id '#{id}' found." 
+#                end
                 return @values[id]
         end
     end
@@ -69,12 +68,20 @@ class Disc
 		@values.clear
 	end
 
+    def addingDate
+        @addingDate
+    end
+
     def addingDate(date)
         raise ArgumentError, "Invalid type, ACDADate expected" unless
             date.is_a? ACDADate
         @addingDate = date
     end
     alias addingDate= addingDate 
+
+    def modifiedDate
+        @modifiedDate
+    end
 
     def modifiedDate(date)
         raise ArgumentError, "Invalid type, ACDADate expected" unless

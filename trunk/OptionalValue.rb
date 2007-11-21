@@ -18,6 +18,8 @@ class OptionalValue
 	end
 
 	def <=>(other)
+        raise ArgumentError, "Invalid comparison." unless
+            other and other.is_a? OptionalValue
 		@value <=> other.value
 	end
 end

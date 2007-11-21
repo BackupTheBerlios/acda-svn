@@ -7,6 +7,7 @@ require 'Persistance.rb'
 class ACDAClient
 def initialize()
     @config = ACDAConfig.new(ACDA.acda_config)
+    @storage = nil
     plugin_dir = ACDA.data_plugins_dir
     plugin_dir = @config.values['plugin_dir'] if @config.values['plugin_dir']
     Persistance.load_plugins(plugin_dir)

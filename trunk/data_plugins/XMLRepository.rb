@@ -177,7 +177,11 @@ def getViews()
 				raise ParseError, "Unknown sort type %s" % sort.attributes['type']
 			end
 
-			view.push_sort(sort.attributes['id'], type)
+            unless types[sort.attributes['id']]
+				raise ParseError, "Invalid sort id %s" % sort.attributes['id']
+            end
+
+			view.push_sort(types[sort.attributes['id']], type)
 		}
 
 		views[view.name] = view
