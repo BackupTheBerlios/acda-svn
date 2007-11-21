@@ -1,13 +1,17 @@
 
-require "OptionalValue.rb"
+require "Value.rb"
 
-class ChoiceValue < OptionalValue
-	def initialize(type, value = nil)
+class ChoiceValue < Value
+	def initialize(type, value)
 		super(type, value)
 	end
 
-    def to_s()
-        @type.choices[value]
+    def display_value()
+        @type.choices[@value]
+    end
+
+    def get_value(value)
+        ChoiceValue.new(value)
     end
 
 	def <=>(other)

@@ -7,9 +7,8 @@ require 'Repository.rb'
 
 require 'View.rb'
 require 'Disc.rb'
-require 'OptionalTypes.rb'
-require 'OptionalValue.rb'
 require 'ChoiceValue.rb'
+require 'OptionalTypes.rb'
 require 'exceptions.rb'
 
 class XMLRepository < Repository
@@ -83,7 +82,7 @@ def getTypes()
 					number = NumberType.new(elem.attributes["id"])
 				end
 
-				types[number.get_id] = number
+				types[number.name] = number
 
 			when "text"
 				string = nil
@@ -94,7 +93,7 @@ def getTypes()
 					string = StringType.new(elem.attributes["id"])
 				end
 
-				types[string.get_id] = string
+				types[string.name] = string
 
 			when "choice"
 				choices = Array.new
@@ -104,10 +103,10 @@ def getTypes()
                 }
 
 				choice = ChoiceType.new(elem.attributes["id"],
-										  choices,
-										  elem.attributes["default"])
+										choices,
+										elem.attributes["default"])
 
-			 	types[choice.get_id] = choice
+			 	types[choice.name] = choice
 			else
 				raise RuntimeError, "Unknown optional type #{elem.name}"
 		end
@@ -117,22 +116,22 @@ def getTypes()
 end
 
 def setType(type)
-	@fields_doc.elements.delete("acda-fields/types/*[@id='#{type.id}']")
+	@fields_doc.elements.delete("acda-fields/types/*[@id='#{type.name}']")
 
 	if type.kind_of? NumberType
 		elem = @fields_doc.elements["acda-fields/types"].add_element("number")
-		elem.attributes["id"] = type.id
+		elem.attributes["id"] = type.name
 		elem.attributes["default"] = type.default.to_s
 
 	elsif type.kind_of? StringType
 		elem = @fields_doc.elements["acda-fields/types"].add_element("text")
-		elem.attributes["id"] = type.id
-		elem.attributes["default"] = type.default
+		elem.attributes["id"] = type.name
+		elem.attributes["default"] = type.default.to_s
 
 	elsif type.kind_of? ChoiceType
 		elem = @fields_doc.elements["acda-fields/types"].add_element("choice")
-		elem.attributes["id"] = type.id
-		elem.attributes["default"] = type.default
+		elem.attributes["id"] = type.name
+		elem.attributes["default"] = type.default.to_s
 
 		type.choices.each { |choice|
 			elem.add_element("entry", { "name" => choice })
@@ -143,17 +142,16 @@ def setType(type)
 end
 
 def remType(type_id)
-	type_id = type_id.id if type_id.is_a? OptionalType
-	if not @fields_doc.delete("acda-fields/types/*[@id='#{type.id}']")
-		raise ArgumentError, "No type with ID #{type.id} found."
+	type_id = type_id.name if type_id.is_a? Type
+	if not @fields_doc.delete("acda-fields/types/*[@id='#{type.name}']")
+		raise ArgumentError, "No type with ID #{type.name} found."
 	end
 
 	@fields_modified = true
 end
 
-def getViews()
+def getViews(types)
 	views = Hash.new
-    types = getTypes()
 	@fields_doc.elements.each('acda-fields/views/view') { |elem|
 		view = View.new(elem.attributes['id'], types)
 
@@ -178,7 +176,7 @@ def getViews()
 			end
 
             unless types[sort.attributes['id']]
-				raise ParseError, "Invalid sort id %s" % sort.attributes['id']
+				raise ParseError, "Invalid sort id '%s'" % sort.attributes['id']
             end
 
 			view.push_sort(types[sort.attributes['id']], type)
@@ -191,7 +189,7 @@ def getViews()
 end
 
 def setView(view)
-	@fields_doc.elements.delete("acda-fields/views/view[@id='#{type.id}']")
+	@fields_doc.elements.delete("acda-fields/views/view[@id='#{type.name}']")
 
 	elem = @fields_doc.elements['acda-fields/views'].add_element('view')
 	elem.attributes['id'] = view.name
@@ -208,60 +206,30 @@ def remView(view_id)
 	@fields_modified = true
 end
 
-def parseDisc(elem, types = getTypes)
-	disc = Disc.new(elem.attributes['number'].to_i, elem.attributes['title'])
+def parseDisc(elem, types)
+    scanned = false
+    if elem.attributes['scanned'] == '0'
+        scanned = false
+    elsif elem.attributes['scanned'] == '1'
+        scanned = true
+    else
+        raise ParseError, "Disc number #{elem.attributes['number']} attribute scanned has an invalid value"
+    end
+
+	disc = Disc.new(elem.attributes['number'].to_i, scanned)
 	elem.elements.each { |sub|
-		case sub.name
-			# standard attributes
-			when 'AddingDate'
-				disc.addingDate = ACDADate.new(Time.at(sub.get_text.value.to_i))
-			when 'ModifiedDate'
-				disc.modifiedDate = ACDADate.new(Time.at(sub.get_text.value.to_i))
-			when 'Scanned'
-				scanned = false
-				val = sub.get_text.value
-				if val == '1' or val == 'true'
-					disc.scanned = true
-				elsif val == '0' or val == 'false'
-					disc.scanned = false
-				else
-					raise RuntimeError,
-                        "Unkown value %s for disc %d element Scanned" % 
-                        disc.number, val
-				end
-			when 'NumberOfFiles'
-				disc.numberOfFiles = sub.get_text.value.to_i
-			when 'BytesSize'
-				disc.bytesSize = sub.get_text.value.to_i
-			# optional types
-			when 'choice'
-				type = types[sub.attributes['id']]
-                unless type
-                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
-                end
-                # factory oder so fuer values
-				disc.addValue(ChoiceValue.new(type, sub.text.to_i))
-			when 'number'
-				type = types[sub.attributes['id']]
-                unless type
-                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
-                end
-                disc.addValue(OptionalValue.new(type, sub.text.to_i))
-			when 'text'
-				type = types[sub.attributes['id']]
-                unless type
-                    raise ParseError, "Invalid type id '#{sub.attributes['id']}'"
-                end
-				disc.addValue(OptionalValue.new(type, sub.text))
-		end
+		type = types[sub.attributes['name']]
+        unless type
+            raise ParseError, "Invalid type name '#{sub.attributes['name']}'"
+        end
+		disc.add_value(type.get_value(sub.text))
 	}
 	disc
 end
 
 # in the array in no order
-def getDiscs()
+def getDiscs(types)
 	discs = Array.new
-	types = getTypes
 
 	@discs_doc.elements.each('acda-discs/disc') { |elem|
 		disc = parseDisc(elem, types)
@@ -287,27 +255,12 @@ def setDisc(disc)
 	end
 
 	elem = @discs_doc.elements['acda-discs'].add_element('disc')
-	elem.attributes['number']	= disc.number
-	elem.attributes['title']	= disc.title
 
-	elem.add_element('AddingDate').text 	= disc.addingDate.to_i.to_s
-	elem.add_element('ModifiedDate').text	= disc.modifiedDate.to_i.to_s
-	elem.add_element('Scanned').text		= disc.scanned.to_s
-	elem.add_element('BytesSize').text		= disc.bytesSize.to_s
-	elem.add_element('NumerOfFiles').text	= disc.numberOfFiles.to_s
+	elem.attributes['number']  = disc.number.to_s
+	elem.attributes['scanned'] = (disc.scanned) ? "1" : "0"
 
 	disc.values.each { |value|
-		elem_name = ''
-
-		if value.type.kind_of? NumberType
-			elem_name = 'number'
-		elsif value.type.kind_of? StringType
-			elem_name = 'text'
-		elsif value.type.kind_of? ChoiceType
-			elem_name = 'choice'
-		end
-
-		elem.add_element(elem_name).text = value.value.to_s
+		elem.add_element('value').text = value.to_s
 	}
 
 	@discs_modified = true
@@ -331,7 +284,7 @@ def renumberDisc(disc_number, new_disc_number)
 		raise ArgumentError, "No disc with number #{disc_number} found."
 	end
 
-	elem.attributes['number'] = new_disc_number
+	elem.attributes['number'] = new_disc_number.to_s
 
 	# Rename files data files :)
 	if File.exists?(@files_dir + '/' + disc_number.to_s)
@@ -427,21 +380,33 @@ end
 end
 
 if $0 == __FILE__
-	rep = XMLRepository.new("$(ACDA_USERDIR)/xml-repo")
+	rep = XMLRepository.new("$(ACDA_USERDIR)/xml-data")
 	rep.connect
-	rep.getTypes.each { |x| puts x.inspect }
+
+	types = rep.getTypes
+	puts "---- TYPES -------"
+    types.each { |x| puts x.inspect }
+    require 'DiscPlugins.rb'
+    DiscPlugins.load_plugins(ACDA.disc_plugins_dir)
+    dpTypes = DiscPlugins.get_types()
+	puts "-------- PLUGIN TYPES -----"
+    dpTypes.each { |x| puts x.inspect }
+	puts "----------------------------"
+    dpTypes.each { |a,b| types[a] = b}
+
 	rep.setType(NumberType.new("Erneuert", 1))
 	rep.setType(ChoiceType.new("Tolle Preise", %w/Haus Auto Garten Fahrrad Apfel Birne Gurke/))
 	rep.flush
-	puts "-----------"
-	rep.getViews.each { |x| puts x.inspect }
-	puts "-----------"
-	rep.getDiscs.each { |x| puts x.inspect }
-	rep.setDisc(Disc.new(10, 'Testdisc', false, 42))
+	puts "------------ VIEWS --------------"
+	rep.getViews(types).each { |x| puts x.inspect }
+	puts "------------ DISCS --------------"
+	rep.getDiscs(types).each { |x| puts x.inspect }
+	rep.setDisc(Disc.new(10, false))
 	rep.renumberDisc(10, 9)
-	rep.changeDisc(Disc.new(9, 'Testdisc2', false, 420))
+	rep.changeDisc(Disc.new(9, false))
 	puts "...."
-	rep.getDiscs.each { |x| puts x.inspect }
+
+	rep.getDiscs(types).each { |x| puts x.inspect }
 else
     Persistance.register(
         RepositoryDefinition.new(

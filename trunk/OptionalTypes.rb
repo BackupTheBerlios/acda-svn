@@ -1,51 +1,44 @@
 
-class OptionalType
-	attr_reader :default, :type_name
+require 'Type.rb'
 
-	def initialize(id, type_name, default)
-		@id = id
-		@type_name = type_name
-		@default = default
-	end
-
-    def get_id()
-        return @id
-    end
-end
-
-class StringType < OptionalType
-	def initialize(id, default = "")
-        default = OptionalValue.new(self, default)
-		super(id, "String", default)
+class StringType < Type
+	def initialize(name, default = "")
+        default = Value.new(self, default)
+		super(name, "String", default)
 	end
 end
 
-class NumberType < OptionalType
-	def initialize(id, default = 0)
-        default = OptionalValue.new(self, default)
-		super(id, "Number", default)
+class NumberType < Type
+	def initialize(name, default = 0)
+        default = Value.new(self, default)
+		super(name, "Number", default)
 	end
 end
 
-class ChoiceType < OptionalType
+class ChoiceType < Type
 	attr_reader :choices
 
-	def initialize(id, choices, default = nil)
+	def initialize(name, choices, default = nil)
 		if default.nil?
 			default = ChoiceValue.new(self, 0)
 		elsif default =~ /^\d$/
 			default = ChoiceValue.new(self, default.to_i)
         else
-            raise ArgumentError, "Invalid default argument" unless
-                default.is_a? ChoiceValue
+            raise ArgumentError, "Invalid default argument '#{default}'"
 		end
+
+        raise ArgumentError, "Invalid choices argument '#{choices}'" unless choices.is_a? Array
 
 		@choices = choices
 		@pos	 = Hash.new
 		hash
 
-		super(id, "Choice", default)
+		super(name, "Choice", default)
 	end
+
+    def get_value(value)
+        return ChoiceValue.new(self, value.to_i)
+    end
 
 	def push_choice(choice)
 		@choices.push choice

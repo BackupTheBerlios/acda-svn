@@ -1,17 +1,17 @@
 
 class RepositoryDefinition
-	attr_accessor :id, :name, :desc, :plugin, :path
+	attr_accessor :name, :long_name, :desc, :plugin, :path
 
-	def initialize(id, name, desc, plugin, path = nil)
-		@id		= id
-		@name 	= name
+	def initialize(name, long_name, desc, plugin, path = nil)
+		@name	= name
+		@long_name = long_name
 		@desc  	= desc
 		@plugin = plugin
 		@path  	= path
 	end
 
 	def to_s()
-		s  = "#{@name} [#{@id}]: #{@desc}"
+		s  = "#{@long_name} [#{@name}]: #{@desc}"
 		s += " #{@path}" if @path
 		return s
 	end
@@ -21,7 +21,7 @@ class Persistance
 	@@plugins = Hash.new
 
 def self.register(definition)
-	@@plugins[definition.id] = definition;
+	@@plugins[definition.name] = definition;
 end
 
 def self.load_plugins(plugins_dir)
@@ -39,18 +39,20 @@ def self.list_plugins()
 	@@plugins
 end
 
-def self.get_plugin(id, parameter)
-	if ! @@plugins[id]
-		raise ArgumentError, "Unknown Repository '#{id}'"
+def self.get_plugin(name, parameter)
+	if ! @@plugins[name]
+		raise ArgumentError, "Unknown Repository '#{name}'"
 	end
 
-	return @@plugins[id].plugin.new(parameter)
+	return @@plugins[name].plugin.new(parameter)
 end
 end
 
 if __FILE__ == $0
-	Persistance.load_plugins()
-	Persistance.list_plugins().each do |id, info|
+    require 'ACDA.rb'
+    
+	Persistance.load_plugins(ACDA.data_plugins_dir)
+	Persistance.list_plugins().each do |name, info|
 		puts info
 	end
 

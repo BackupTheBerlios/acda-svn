@@ -1,92 +1,39 @@
 
+require 'Value.rb'
 require 'OptionalTypes.rb'
-require 'OptionalValue.rb'
-require 'ACDADate.rb'
 
 class Disc
-	attr_accessor :number, :title,
-				  :scanned, :bytesSize,
-                  :numberOfFiles, :values
-	alias id number
+	attr_reader :number, :values, :scanned
 
-	def initialize(number, title = '', scanned = false, bytesSize = 0,
-				   numberOfFiles = 0, addingDate = nil, modifiedDate = nil)
-		@number		   = number
-		@title		   = (title) ? title : ''
-		@scanned       = scanned
-		@bytesSize	   = bytesSize
-		@numberOfFiles = numberOfFiles
-		@scanned	   = scanned
-        if addingDate
-		    @addingDate = addingDate
-        else
-		    @addingDate = ACDADate.new(Time.now)
-        end
-
-		@modifiedDate = modifiedDate
-		@modifiedDate = ACDADate.new(Time.now) if not @modifiedDate
+	def initialize(number, scanned = false)
+		@number	 = number
+		@scanned = scanned
 
 		@values = Hash.new
 	end
 
-	def modified
-		@modifiedDate = Time.now
-	end
-
-	def addValue(value)
-        if not value or value.class == "Array"
+	def add_value(value)
+        unless value or value.is_a? Value
             raise RuntimeError, "Invalid type added."
         end
-		@values[value.get_type.get_id] = value
+		@values[value.name] = value
 	end
 
-    def get_value(id)
-        case id
+    def get_value(name)
+        case name
             when "Number"
-                return @number
-            when "Title"
-                return @title
-            when "AddingDate"
-                return @addingDate
-            when "ModifiedDate"
-                return @modifiedDate
+                return Value.new(NumberType.new("Number"), @number)
             when "Scanned"
-                return @scanned
-            when "BytesSize"
-                return @bytesSize
-            when "NumberOfFiles"
-                return @numberOfFiles
+                return Value.new(NumberType.new("Scanned"), @scanned)
             else
 #                unless @values[id]
 #                    raise NoSuchField, "No field with id '#{id}' found." 
 #                end
-                return @values[id]
+                return @values[name]
         end
     end
 
-	def clearValues
+	def clear_values
 		@values.clear
 	end
-
-    def addingDate
-        @addingDate
-    end
-
-    def addingDate(date)
-        raise ArgumentError, "Invalid type, ACDADate expected" unless
-            date.is_a? ACDADate
-        @addingDate = date
-    end
-    alias addingDate= addingDate 
-
-    def modifiedDate
-        @modifiedDate
-    end
-
-    def modifiedDate(date)
-        raise ArgumentError, "Invalid type, ACDADate expected" unless
-            date.is_a? ACDADate
-        @modified = date
-    end
-    alias modifiedDate= modifiedDate
 end

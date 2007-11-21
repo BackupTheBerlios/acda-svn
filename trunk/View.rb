@@ -17,7 +17,7 @@ class StableSort
         @by = by
         @type = type
 
-        raise ArgumentError, "Sort by must be a Type" unless by.is_a? OptionalType
+        raise ArgumentError, "Sort by must be a Type" unless by.is_a? Type
 
         if type != @@ASCENDING and type != @@DESCENDING
             raise ArgumentError, "Sort type must be either ascending "+
@@ -27,10 +27,10 @@ class StableSort
 
     def do(elements)
         elements.sort! { |a,b|
-            val_a = a.get_value(@by.get_id())
+            val_a = a.get_value(@by.name())
             val_a = @by.default unless val_a
 
-            val_b = b.get_value(@by.get_id())
+            val_b = b.get_value(@by.name())
             val_b = @by.default unless val_b
 
             if (@type == @@ASCENDING)
@@ -108,7 +108,7 @@ class View
 
 	def push_sort(by, type)
         raise ArgumentError, "name must not be nil" unless name
-        raise ArgumentError, "Sort by must be a Type" unless by.is_a? OptionalType
+        raise ArgumentError, "Sort by must be a Type" unless by.is_a? Type
 		@sorts.push(StableSort.new(by, type))
 	end
 
@@ -132,13 +132,13 @@ class View
             disc_field = Array.new
             @fields.each { |field|
                 begin
-                    disc_field << disc.get_value(field[0])
+                    disc_field << disc.get_value(field[0]).display_value
                 rescue NoSuchField => ex
                     unless @types[field[0]]
                         puts "View [#{name}]: unkown field '#{field[0]}' found."
                         disc_field << "-"
                     else
-                        disc_field << @types[field[0]].default
+                        disc_field << @types[field[0]].default.display_value
                     end
                 end
             }
