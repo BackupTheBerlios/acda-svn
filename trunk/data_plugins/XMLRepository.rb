@@ -44,12 +44,24 @@ def connect()
 	
 
 	fields_file = File.new(@fields_path)
+   begin
 	@fields_doc = Document.new(fields_file)
 	@fields_modified = true
 
+   rescue REXML::ParseException => ex
+      raise RepositoryError, "The disc xml document '@discs_path' is invalid:\n"+
+                              ex
+   end
+
 	discs_file = File.new(@discs_path)
+   begin
 	@discs_doc = Document.new(discs_file)
 	@discs_modified = false
+
+   rescue REXML::ParseException => ex
+      raise RepositoryError, "The disc xml document '@discs_path' is invalid:\n"+
+                              ex
+   end
 end
 
 def disconnect()
@@ -77,7 +89,7 @@ def getTypes()
 				number = nil
 				if elem.attributes["default"]
 					number = NumberType.new(elem.attributes["id"],
-											  elem.attributes["default"].to_i)
+											  elem.attributes["default"])
 				else
 					number = NumberType.new(elem.attributes["id"])
 				end
@@ -102,9 +114,12 @@ def getTypes()
                     |entry| choices.push(entry.attributes["name"])
                 }
 
-				choice = ChoiceType.new(elem.attributes["id"],
-										choices,
-										elem.attributes["default"])
+            if elem.attributes["default"]
+				   choice = ChoiceType.new(elem.attributes["id"],
+										choices,	elem.attributes["default"])
+            else
+				   choice = ChoiceType.new(elem.attributes["id"], choices)
+            end
 
 			 	types[choice.name] = choice
 			else

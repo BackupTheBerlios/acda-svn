@@ -10,13 +10,13 @@ end
 
 def self.get_types()
     types = Hash.new
-    types['Number'] = NumberType.new("Number", 0)
-    types['Scanned'] = NumberType.new("Scanned", 0)
-    types['Title'] = StringType.new("Title", 0)
-    types['AddingDate'] = DateType.new("AddingDate", 0)
-    types['ModifiedDate'] = DateType.new("ModifiedDate", 0)
-    types['ByteSize'] = NumberType.new("ByteSize", 0)
-    types['NumberOfFiles'] = NumberType.new("NumerOfFiles", 0)
+    types['Number'] = NumberType.new("Number")
+    types['Scanned'] = BoolType.new("Scanned")
+    types['Title'] = StringType.new("Title")
+    types['AddingDate'] = DateType.new("AddingDate")
+    types['ModifiedDate'] = DateType.new("ModifiedDate")
+    types['ByteSize'] = NumberType.new("ByteSize")
+    types['NumberOfFiles'] = NumberType.new("NumerOfFiles")
     return types
 end
 

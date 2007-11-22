@@ -132,7 +132,6 @@ class View
             disc_field = Array.new
             @fields.each { |field|
                 begin
-                    puts "#{field[0]} -> #{disc.get_value(field[0]).inspect} -> #{disc.get_value(field[0]).display_value}"
                     disc_field << disc.get_value(field[0]).display_value
                 rescue NoSuchField => ex
                     unless @types[field[0]]

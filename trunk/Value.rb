@@ -38,9 +38,9 @@ class BoolValue < Value
 	def initialize(type, value = nil)
       raise ArgumentError, "Invalid type parameter specified." unless type.is_a? BoolType
       raise ArgumentError, "Invalid value argument type '#{value.class}'" unless
-         value.is_a? String
+         value.is_a? String or value.is_a? FalseClass or value.is_a? TrueClass
 
-      if value
+      if value and value.is_a? String
          if value == "0"
             value = false
          elsif value == "1"
