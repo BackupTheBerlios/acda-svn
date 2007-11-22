@@ -79,6 +79,8 @@ when 'list'
     printer.flush
     rescue NoSuchView => ex
         puts ex
+    rescue RepositoryError => ex
+        puts ex
     end
 when 'show'
 when 'search'

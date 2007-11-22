@@ -1,4 +1,7 @@
 
+class RepositoryError < Exception
+end
+
 class FileNotFoundError < Exception
 end
 

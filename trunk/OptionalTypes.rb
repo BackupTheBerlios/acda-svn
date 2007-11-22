@@ -3,42 +3,48 @@ require 'Type.rb'
 
 class StringType < Type
 	def initialize(name, default = "")
-        default = Value.new(self, default)
-		super(name, "String", default)
+      raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
+         default.is_a? String
+
+      default = Value.new(self, default)
+		super(name, "String", default, Value)
 	end
 end
 
 class NumberType < Type
-	def initialize(name, default = 0)
-        default = Value.new(self, default)
-		super(name, "Number", default)
+	def initialize(name, default = "0")
+      raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
+         default.is_a? String
+
+		super(name, "Number", default, Value)
+	end
+end
+
+class BoolType < Type
+	def initialize(name, default = "0")
+      raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
+         default.is_a? String
+
+      default = BoolValue.new(self, default)
+		super(name, "Bool", default, BoolValue)
 	end
 end
 
 class ChoiceType < Type
 	attr_reader :choices
 
-	def initialize(name, choices, default = nil)
-		if default.nil?
-			default = ChoiceValue.new(self, 0)
-		elsif default =~ /^\d$/
-			default = ChoiceValue.new(self, default.to_i)
-        else
-            raise ArgumentError, "Invalid default argument '#{default}'"
-		end
+	def initialize(name, choices, default = "0")
+      raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
+         default.is_a? String
 
-        raise ArgumentError, "Invalid choices argument '#{choices}'" unless choices.is_a? Array
+      raise ArgumentError, "Invalid choices argument '#{choices}'" unless choices.is_a? Array
 
 		@choices = choices
 		@pos	 = Hash.new
 		hash
 
-		super(name, "Choice", default)
+		super(name, "Choice", default, ChoiceValue)
 	end
-
-    def get_value(value)
-        return ChoiceValue.new(self, value.to_i)
-    end
 
 	def push_choice(choice)
 		@choices.push choice

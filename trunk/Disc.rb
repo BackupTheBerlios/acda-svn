@@ -24,7 +24,7 @@ class Disc
             when "Number"
                 return Value.new(NumberType.new("Number"), @number)
             when "Scanned"
-                return Value.new(NumberType.new("Scanned"), @scanned)
+                return Value.new(BoolType.new("Scanned"), @scanned)
             else
 #                unless @values[id]
 #                    raise NoSuchField, "No field with id '#{id}' found." 
