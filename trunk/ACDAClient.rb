@@ -9,6 +9,8 @@ class ACDAClient
 def initialize()
     @config = ACDAConfig.new(ACDA.acda_config)
     @storage = nil
+    @types   = nil
+
     plugin_dir = ACDA.data_plugins_dir
     plugin_dir = @config.values['plugin_dir'] if @config.values['plugin_dir']
     disc_plugin_dir = ACDA.disc_plugins_dir
@@ -38,9 +40,11 @@ def load_config()
 end
 
 def get_types()
-    types = @storage.getTypes()
-    DiscPlugins.get_types().each { |a,b| types[a] = b }
-    return types
+    unless @types
+      @types = DiscPlugins.get_types().merge(@storage.getTypes())
+    end
+
+    return @types
 end
 
 def get_views()
