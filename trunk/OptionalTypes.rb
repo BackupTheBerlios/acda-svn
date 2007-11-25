@@ -6,7 +6,6 @@ class StringType < Type
       raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
          default.is_a? String
 
-      default = Value.new(self, default)
 		super(name, "String", default, Value)
 	end
 end
@@ -25,7 +24,6 @@ class BoolType < Type
       raise ArgumentError, "Invalid default argument type '#{default.class}'" unless
          default.is_a? String
 
-      default = BoolValue.new(self, default)
 		super(name, "Bool", default, BoolValue)
 	end
 end

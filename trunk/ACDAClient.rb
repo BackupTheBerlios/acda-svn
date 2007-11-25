@@ -41,7 +41,9 @@ end
 
 def get_types()
     unless @types
-      @types = DiscPlugins.get_types().merge(@storage.getTypes())
+      @types = DiscPlugins.get_types()
+      @types.merge!(ACDA.default_types())
+      @types.merge!(@storage.getTypes())
     end
 
     return @types
@@ -52,7 +54,7 @@ def get_views()
 end
 
 def get_view(name)
-    ret = @storage.getViews()[name]
+    ret = @storage.getViews(get_types())[name]
     raise NoSuchView, "No such view '#{name}' exists." unless ret
     ret
 end
@@ -64,8 +66,6 @@ end
 def get_discs()
     return @storage.getDiscs(get_types())
 end
-
-# README maybe use this as a library thing to be used by cli and gui
 
 end
 

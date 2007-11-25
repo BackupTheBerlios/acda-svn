@@ -131,15 +131,15 @@ class View
         discs.each { |disc|
             disc_field = Array.new
             @fields.each { |field|
-                begin
-                    disc_field << disc.get_value(field[0]).display_value
-                rescue NoSuchField => ex
-                    unless @types[field[0]]
-                        puts "View [#{name}]: unkown field '#{field[0]}' found."
-                        disc_field << "-"
-                    else
-                        disc_field << @types[field[0]].default.display_value
-                    end
+                unless @types[field[0]]
+                    raise RuntimeError, "No such field '#{field[0]}' from view #{name}"
+                end
+
+                value = disc.get_value(field[0])
+                if value
+                    disc_field << value.display_value
+                else
+                    disc_field << @types[field[0]].default.display_value
                 end
             }
             yield disc_field

@@ -9,15 +9,7 @@ def initialize(parameter)
 end
 
 def self.get_types()
-    types = Hash.new
-    types['Number'] = NumberType.new("Number")
-    types['Scanned'] = BoolType.new("Scanned")
-    types['Title'] = StringType.new("Title")
-    types['AddingDate'] = DateType.new("AddingDate")
-    types['ModifiedDate'] = DateType.new("ModifiedDate")
-    types['ByteSize'] = NumberType.new("ByteSize")
-    types['NumberOfFiles'] = NumberType.new("NumerOfFiles")
-    return types
+    return Hash.new
 end
 
 def add(disc)
