@@ -7,11 +7,15 @@ def initialize()
     @width = []
 end
 
-def setCaptions(captions)
+def set_captions(captions)
     puts captions.join(' ')
 end
 
-def addLine(values)
+def add_separator()
+   puts "\n"
+end
+
+def add_line(values)
     if width.size == values.size
         i = 0
         values.each { |value|

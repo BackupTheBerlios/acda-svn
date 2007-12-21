@@ -10,6 +10,7 @@ def initialize()
     @config = ACDAConfig.new(ACDA.acda_config)
     @storage = nil
     @types   = nil
+    @discs   = nil
 
     plugin_dir = ACDA.data_plugins_dir
     plugin_dir = @config.values['plugin_dir'] if @config.values['plugin_dir']
@@ -64,7 +65,15 @@ def default_view()
 end
 
 def get_discs()
-    return @storage.getDiscs(get_types())
+    unless @discs
+      @discs = @storage.getDiscs(get_types())
+    end
+    return @discs
+end
+
+def get_disc(number)
+   discs = get_discs
+   return discs.find { |disc| disc.number == number }
 end
 
 end

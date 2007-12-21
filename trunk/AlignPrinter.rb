@@ -1,6 +1,9 @@
 
+class Separator
+end
+
 class AlignPrinter
-attr_accessor :width
+attr_accessor :width, :vseparator
 
 def initialize(max = 30)
     @directOutput = true
@@ -8,9 +11,10 @@ def initialize(max = 30)
     @captions   = []
     @lines      = []
     @max        = max
+    @vseparator = "---\n"
 end
 
-def setCaptions(captions)
+def set_captions(captions)
     @captions = captions
     i = 0
     captions.each { |caption|
@@ -19,19 +23,28 @@ def setCaptions(captions)
     }
 end
 
-def addLine(values)
-    unless values.size == @captions.size
+def add_line(values)
+    if @captions.size > 0 and values.size != @captions.size
         raise ArgumentError, "You must specify as many columns as captions."
     end
     @lines.push values
     i = 0
     values.each { |value|
-        @width[i] = value.to_s.size if (value.to_s.size() > @width[i])
+        @width[i] = value.to_s.size if not @width[i] or (value.to_s.size() > @width[i])
         i += 1
     }
 end
 
-def printLine(line)
+def add_separator()
+   @lines.push Separator.new
+end
+
+def print_line(line)
+    if line.is_a? Separator
+       print @vseparator
+       return
+    end
+
     i = 0
     line.each { |entry|
         print entry.to_s.ljust(@width[i]), ' '
@@ -41,8 +54,11 @@ def printLine(line)
 end
 
 def flush()
-    printLine(@captions)
-    puts "-" * 60
-    @lines.each { |line| printLine(line) }
+    if @captions.size > 0
+       print_line(@captions)
+       puts "-" * 60
+    end
+
+    @lines.each { |line| print_line(line) }
 end
 end

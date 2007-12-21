@@ -3,13 +3,13 @@ require 'Value.rb'
 require 'OptionalTypes.rb'
 
 class Disc
-	attr_reader :number, :values, :scanned
+	attr_reader :values
 
 	def initialize(number, scanned = false)
-		@number	 = number
-		@scanned = scanned
-
 		@values = Hash.new
+
+      @values['Number']  = Value.new(NumberType.new("Number"), number)
+      @values['Scanned'] = BoolValue.new(BoolType.new("Scanned"), scanned)
 	end
 
 	def add_value(value)
@@ -20,20 +20,18 @@ class Disc
 	end
 
     def get_value(name)
-        case name
-            when "Number"
-                return Value.new(NumberType.new("Number"), @number)
-            when "Scanned"
-                return BoolValue.new(BoolType.new("Scanned"), scanned)
-            else
-#                unless @values[id]
-#                    raise NoSuchField, "No field with id '#{id}' found." 
-#                end
-                return @values[name]
-        end
+        return @values[name]
     end
 
-	def clear_values
+    def number
+      return @values['Number'].value
+    end
+
+    def scanned
+      return @values['Scanned'].value
+    end
+
+    def clear_values
 		@values.clear
-	end
+    end
 end
