@@ -1,6 +1,6 @@
 
 require 'sdbm'
-require 'ACDA.rb'
+require 'ACDAConstants.rb'
 require 'Repository.rb'
 
 require 'OptionalTypes.rb'
@@ -8,7 +8,7 @@ require 'OptionalTypes.rb'
 class DBMRepository < Repository
 
 def initialize(parameter)
-	@directory = parameter.sub(/\$\(ACDA_USERDIR\)/, ACDA.acda_userdir)
+	@directory = parameter.sub(/\$\(ACDA_USERDIR\)/, ACDAConstants.acda_userdir)
 
 	super("dbm", "Stores the repository in DBM files in '#{@directory}'")
 
@@ -48,11 +48,11 @@ end
 private
 
 def DBMRepository.createFieldsDefault(path)
-	FileUtils.copy(ACDA.acda_home + "/examples/acda-fields.dbm", path)
+	FileUtils.copy(ACDAConstants.acda_home + "/examples/acda-fields.dbm", path)
 end
 
 def DBMRepository.createDiscsDefault(path)
-	FileUtils.copy(ACDA.acda_home + "/examples/acda-discs.dbm", path)
+	FileUtils.copy(ACDAConstants.acda_home + "/examples/acda-discs.dbm", path)
 end
 
 end

@@ -49,9 +49,9 @@ end
 end
 
 if __FILE__ == $0
-    require 'ACDA.rb'
+  require 'ACDAConstants.rb'
     
-	Persistance.load_plugins(ACDA.data_plugins_dir)
+	Persistance.load_plugins(ACDAConstants.data_plugins_dir)
 	Persistance.list_plugins().each do |name, info|
 		puts info
 	end

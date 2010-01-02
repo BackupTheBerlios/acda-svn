@@ -1,5 +1,5 @@
 
-require 'ACDA.rb'
+require 'ACDAConstants.rb'
 require 'DiscPlugin.rb'
 require 'Type.rb'
 require 'Value.rb'
@@ -36,28 +36,30 @@ end
 
 class BasicInfo < DiscPlugin
 
-def initialize(parameter)
-end
-
 def self.get_types()
     Hash.new
 end
 
-def add(disc)
-        if addingDate
-		    @addingDate = addingDate
-        else
-		    @addingDate = ACDADate.new(Time.now)
-        end
+def self.add(disc)
+# TODO fix
+       # if addingDate
+		   # @addingDate = addingDate
+       # else
+		   # @addingDate = ACDADate.new(Time.now)
+       # end
+		    #@addingDate = ACDADate.new(Time.now)
 
-		@modifiedDate = modifiedDate
-		@modifiedDate = ACDADate.new(Time.now) if not @modifiedDate
+		#@modifiedDate = modifiedDate
+		#@modifiedDate = ACDADate.new(Time.now) if not @modifiedDate
 end
 
-def scan(disc, path = nil)
+def self.scan(disc, path)
 end
 
-def modify(disc)
+def self.scan_file(disc, file)
+end
+
+def self.modify(disc)
 end
 
 end

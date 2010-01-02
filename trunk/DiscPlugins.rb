@@ -50,23 +50,48 @@ def self.list_plugins()
 	@@plugins
 end
 
-def self.get_plugin(id, parameter = nil)
+def self.get_plugin(id)
 	if ! @@plugins[id]
 		raise ArgumentError, "Unknown Repository '#{id}'"
 	end
 
-	return @@plugins[id].plugin.new(parameter)
+	return @@plugins[id].plugin
 end
 
 def self.get_plugins()
     return @@plugins
 end
+
+def self.add_disc(disc)
+  @@plugins.each() { |name, plugin|
+    plugin.plugin.add(disc)
+  }
+end
+
+def self.scan_disc(disc, path)
+  @@plugins.each() { |name, plugin|
+    plugin.plugin.scan(disc, path)
+  }
+end
+
+def self.scan_file(disc, file)
+  @@plugins.each() { |name, plugin|
+    plugin.plugin.scan_file(disc, file)
+  }
+end
+
+def self.modify_idsc(disc)
+  @@plugins.each() { |name, plugin|
+    plugin.plugin.modify(disc)
+  }
+end
+
 end
 
 if __FILE__ == $0
-    require 'ACDA.rb'
+  require 'ACDAConstants.rb'
 
-	DiscPlugins.load_plugins(ACDA.disc_plugins_dir)
+	DiscPlugins.load_plugins(ACDAConstants.disc_plugins_dir)
 	DiscPlugins.list_plugins().each do |id, info|
 		puts info
 	end

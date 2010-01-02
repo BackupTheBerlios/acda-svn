@@ -7,13 +7,16 @@ end
 def self.get_types()
 end
 
-def add(disc)
+def self.add(disc)
 end
 
-def scan(disc, path = nil)
+def self.scan(disc, path)
 end
 
-def modify(disc)
+def self.scan_file(disc, file)
+end
+
+def self.modify(disc)
 end
 
 end

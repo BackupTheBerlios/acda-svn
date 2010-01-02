@@ -2,7 +2,7 @@
 require 'fileutils.rb'
 require 'rexml/document'
 
-require 'ACDA.rb'
+require 'ACDAConstants.rb'
 require 'Repository.rb'
 
 require 'View.rb'
@@ -15,7 +15,7 @@ class XMLRepository < Repository
 include REXML
 
 def initialize(parameter)
-	@directory = parameter.sub(/\$\(ACDA_USERDIR\)/, ACDA.acda_userdir)
+	@directory = parameter.sub(/\$\(ACDA_USERDIR\)/, ACDAConstants.acda_userdir)
 
 	super("xml", "Stores the repository in XML files in '#{@directory}'")
 
@@ -71,12 +71,12 @@ end
 def flush()
 	if @fields_modified
 		fields_file = File.new(@fields_path, "w")
-		@fields_doc.write(fields_file, 0)
+		@fields_doc.write(fields_file)
 	end
 
 	if @discs_modified
 		discs_file = File.new(@discs_path, "w")
-		@discs_doc.write(discs_file, 0)
+		@discs_doc.write(discs_file)
 	end
 end
 
@@ -133,6 +133,8 @@ end
 def setType(type)
 	@fields_doc.elements.delete("acda-fields/types/*[@id='#{type.name}']")
 
+    # TODO use ROXML
+    # Use classes and mapping table for types, plugin style, no hardcoded stuff
 	if type.kind_of? NumberType
 		elem = @fields_doc.elements["acda-fields/types"].add_element("number")
 		elem.attributes["id"] = type.name
@@ -275,7 +277,10 @@ def setDisc(disc)
 	elem.attributes['scanned'] = (disc.scanned) ? "1" : "0"
 
 	disc.values.each { |value|
-		elem.add_element('value').text = value.to_s
+    next if value.name == 'Scanned' || value.name == 'Number'
+    value_elem = elem.add_element('value')
+		value_elem.attributes['name'] = value.name
+		value_elem.text = value.to_s
 	}
 
 	@discs_modified = true
@@ -353,6 +358,7 @@ end
 
 def addFile(parent, file)
 	elem = parent.add_element('file')
+    # static attributes not nice for entity class persistation, roxml?
 	elem.add_element('name').text = file.name
 	elem.add_element('path').text = file.path
 	elem.add_element('dir').text  = file.dir.to_s
@@ -371,7 +377,7 @@ def setFiles(disc_number, root)
     addFile(root_elem, root)
 
     file = File.new(@files_dir + "/" + disc_number.to_s, "w")
-	doc.write(file, 0)
+	doc.write(file)
 end
 
 def remFiles(disc_disc)
@@ -385,11 +391,11 @@ end
 private
 
 def XMLRepository.createFieldsDefault(path)
-	FileUtils.copy(ACDA.acda_home + "/examples/acda-fields.xml", path)
+	FileUtils.copy(ACDAConstants.acda_home + "/examples/acda-fields.xml", path)
 end
 
 def XMLRepository.createDiscsDefault(path)
-	FileUtils.copy(ACDA.acda_home + "/examples/acda-discs.xml", path)
+	FileUtils.copy(ACDAConstants.acda_home + "/examples/acda-discs.xml", path)
 end
 
 end
@@ -402,7 +408,7 @@ if $0 == __FILE__
 	puts "---- TYPES -------"
     types.each { |x| puts x.inspect }
     require 'DiscPlugins.rb'
-    DiscPlugins.load_plugins(ACDA.disc_plugins_dir)
+    DiscPlugins.load_plugins(ACDAConstants.disc_plugins_dir)
     dpTypes = DiscPlugins.get_types()
 	puts "-------- PLUGIN TYPES -----"
     dpTypes.each { |x| puts x.inspect }

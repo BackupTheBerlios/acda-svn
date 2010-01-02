@@ -1,6 +1,6 @@
 
 require 'ftools'
-require 'ACDA.rb'
+require 'ACDAConstants.rb'
 require 'fileutils.rb'
 require 'exceptions.rb'
 
@@ -47,7 +47,7 @@ class ACDAConfig
 	def createDefaultConfig(path)
         return if File.file?(path)
 
-        default=ACDA.acda_home + '/examples/acda.cfg'
+        default=ACDAConstants.acda_home + '/examples/acda.cfg'
         unless File.file?(default)
             raise FileNotFoundError, "Could not find default config "+
                                      "file '#{default}'\n"
@@ -60,6 +60,6 @@ class ACDAConfig
 end
 
 if $0 == __FILE__
-conf = ACDAConfig.new(ACDA.acda_config)
+conf = ACDAConfig.new(ACDAConstants.acda_config)
 puts conf.values.inspect
 end

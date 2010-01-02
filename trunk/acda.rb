@@ -1,6 +1,6 @@
 #!/usr/bin/ruby
 
-require 'ACDA.rb'
+require 'ACDAConstants.rb'
 require 'ACDAConfig.rb'
 require 'ACDAClient.rb'
 require 'Persistance.rb'
@@ -152,6 +152,13 @@ when 'search'
 when 'add'
 when 'remove'
 when 'scan'
+    # Initialize the client
+    client = ACDAClient.new
+    client.load_config()
+
+    disc = client.new_disc()
+    client.scan_disc(disc)
+    client.add_disc(disc)
 else
     puts "Unknown action '#{action}'"
 end

@@ -1,14 +1,15 @@
 
 require 'DirTraverser.rb'
 require 'ACDAFile.rb'
+require 'DiscPlugins.rb'
 
 class DiscParser
 	attr_reader :root
-	attr_accessor :callback
+	attr_accessor :disc
 
 	def initialize
 		@root = nil
-		@callback = nil
+    @disc = nil
 	end
 
 	def parse(path)
@@ -26,20 +27,20 @@ class DiscParser
 
 	def addDirectory(parent, path)
 		file = ACDAFile.createFromPath(path)
-		@callback.addDirectory(path) if @callback
 		parent.addChild(file) if parent
 		@root = file unless @root
+    DiscPlugins.scan_file(disc, file)
 
 		return file
 	end
 
 	def addFile(parent, path)
 		file = ACDAFile.createFromPath(path)
-		@callback.addFile(path) if @callback
 		if parent
 			raise ArgumentError, "The specified parent is not a directory" unless parent.directory?
 			parent.addChild(file)
 		end
+    DiscPlugins.scan_file(disc, file)
 
 		return file
 	end

@@ -41,9 +41,9 @@ class BoolValue < Value
          value.is_a? String or value.is_a? FalseClass or value.is_a? TrueClass
 
       if value and value.is_a? String
-         if value == "0"
+         if value == "0" || value == "false"
             value = false
-         elsif value == "1"
+         elsif value == "1" || value = "true"
             value = true
          else
             raise ArgumentError, "Invalid value argument '#{value}'"

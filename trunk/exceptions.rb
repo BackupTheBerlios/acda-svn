@@ -1,4 +1,7 @@
 
+class NotInitializedError < Exception
+end
+
 class RepositoryError < Exception
 end
 
