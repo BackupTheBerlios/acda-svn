@@ -80,6 +80,7 @@ def flush()
 	end
 end
 
+# TODO do not use calmel case
 def getTypes()
 	types = Hash.new
 
@@ -161,7 +162,7 @@ end
 def remType(type_id)
 	type_id = type_id.name if type_id.is_a? Type
 	if not @fields_doc.delete("acda-fields/types/*[@id='#{type.name}']")
-		raise ArgumentError, "No type with ID #{type.name} found."
+		raise ACDAArgumentError, "No type with ID #{type.name} found."
 	end
 
 	@fields_modified = true
@@ -217,7 +218,7 @@ end
 def remView(view_id)
 	view_id = view_id.id if view_id.is_a? View
 	if not @fields_doc.elements.delete("acda-fields/views/viewid='#{view_id}']")
-		raise ArgumentError, "No view with ID #{view_id} found."
+		raise ACDAArgumentError, "No view with ID #{view_id} found."
 	end
 
 	@fields_modified = true
@@ -258,7 +259,7 @@ end
 
 def getDisc(disc_number)
 	elem = @discs_doc.elements["acda-discs/disc[@number='#{disc_number}']"]
-	raise RuntimeError, "No disc number #{disc_id} found" unless elem
+	raise ACDAArgumentError, "No disc number #{disc_number} found" unless elem
 	return parseDisc(elem)
 end
 
@@ -268,7 +269,7 @@ end
 
 def setDisc(disc)
 	if existsDisc?(disc.number)
-		raise ArgumentError, "A disc with the number #{disc.number} allready exists"
+		raise ACDAArgumentError, "A disc with the number #{disc.number} allready exists"
 	end
 
 	elem = @discs_doc.elements['acda-discs'].add_element('disc')
@@ -296,12 +297,12 @@ end
 
 def renumberDisc(disc_number, new_disc_number)
 	if existsDisc?(new_disc_number)
-		raise ArgumentError, "Destination disc number #{new_disc_number} allready exists"
+		raise ACDAArgumentError, "Destination disc number #{new_disc_number} allready exists"
 	end
 
 	elem = @discs_doc.elements["acda-discs/disc[@number='#{disc_number}']"]
 	unless elem
-		raise ArgumentError, "No disc with number #{disc_number} found."
+		raise ACDAArgumentError, "No disc with number #{disc_number} found."
 	end
 
 	elem.attributes['number'] = new_disc_number.to_s
@@ -315,8 +316,9 @@ def renumberDisc(disc_number, new_disc_number)
 end
 
 def remDisc(disc_number, delete_files = true)
+
 	unless @discs_doc.elements.delete("acda-discs/disc[@number='#{disc_number}']")
-		raise ArgumentError, "No disc number #{disc_number} found"
+		raise ACDAArgumentError, "No disc number #{disc_number} found"
 	end
 
 	remFiles(disc_number) if delete_files
@@ -325,35 +327,37 @@ def remDisc(disc_number, delete_files = true)
 end
 
 def getFile(elem)
-    file = ACDAFile.new()
-    file.name = elem.elements['name']
-    file.path = elem.elements['path']
-    file.dir  = (elem.elements['dir'] == 'true')
-    file.size = elem.elements['size'].to_i
-    file.mod  = elem.elements['mod'].to_i
+  file = ACDAFile.new()
+  file.name = elem.elements['name'].text
+  file.path = elem.elements['path'].text
+  file.dir  = (elem.elements['dir'].text == 'true')
+  file.size = elem.elements['size'].text.to_i
+  file.mod  = elem.elements['mod'].text.to_i
 
 
-	children = elem.elements['file']
-    if children
-        children.each { |child| file.children.push getFile(child) }
-    end
+	children = elem.get_elements('file')
+  if children
+    children.each { |child| file.children.push getFile(child) }
+  end
+  return file
 end
 private :getFile
 
 def getFiles(disc_number)
-    file = File.new(@files_dir + "/" + disc_number.to_s, "w")
-	unless file
-		raise ArgumentError, "No files for disc number #{disc_number} found"
+  filename = @files_dir + "/" + disc_number.to_s
+	unless File.file?(filename)
+		raise ACDAArgumentError, "No files for disc number #{disc_number} found"
 	end
+    file = File.new(filename, "r")
 
     doc = Document.new(file)
 
-	elem = doc.elements["acda-files[@disc='#{disc_number}']"]
+	elem = doc.elements["acda_files[@disc='#{disc_number}']"]
 	unless elem
-		raise RuntimeError, "A file for disc #{disc_number} was found but it has a different content."
+		raise RuntimeError, "Inconsistency, files for disc #{disc_number} was found but it has a different content."
 	end
 
-    root = getFile(elem)
+    return getFile(elem.get_elements('/acda_files/file')[0])
 end
 
 def addFile(parent, file)
@@ -380,10 +384,13 @@ def setFiles(disc_number, root)
 	doc.write(file)
 end
 
-def remFiles(disc_disc)
-    unless File.exists?(@files_dir + "/" + disc_number.to_s)
-		raise ArgumentError, "No files for disc number #{disc_number} found"
-    end
+def remFiles(disc_number)
+    # No check for existance here, it might not be present. Checking if the
+    # disc has any file is to much work, just see if there are files or not.
+    #
+    #unless File.exists?(@files_dir + "/" + disc_number.to_s)
+		#raise ACDAArgumentError, "No files for disc number #{disc_number} found"
+    #end
         
     File.unlink(@files_dir + "/" + disc_number.to_s)
 end

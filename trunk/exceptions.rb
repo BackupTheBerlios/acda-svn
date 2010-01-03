@@ -1,4 +1,7 @@
 
+class ACDAArgumentError < Exception
+end
+
 class NotInitializedError < Exception
 end
 

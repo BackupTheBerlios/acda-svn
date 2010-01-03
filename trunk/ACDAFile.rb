@@ -3,7 +3,7 @@ class ACDAFile
 attr_accessor :name, :path, :dir, :size, :mod, :children
 
 def ACDAFile.createFromPath(path)
-	stat = File.stat(path)
+	stat = File.lstat(path)
 	name = File.basename(path)
 	dir  = stat.directory?
 	size = stat.size
@@ -12,13 +12,22 @@ def ACDAFile.createFromPath(path)
 	ACDAFile.new(name, path, dir, size, mod)
 end
 
-def initialize(name, path, dir, size, mod)
+def initialize(name = nil, path = nil, dir = nil, size = nil, mod = nil)
 	@name = name
 	@path = path
 	@dir  = dir
 	@size = size
 	@mod  = mod
 	@children = Array.new
+end
+
+def display_size
+  # TODO make it more intelligent and configurable, extern formatter
+  return sprintf("%.2f MiB", size / 1024.0 / 1024.0)
+end
+
+def display_lastmod
+  Time.at(mod).strftime '%H:%M:%S %d.%m.%Y'
 end
 
 def directory?

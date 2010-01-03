@@ -1,5 +1,5 @@
 
-class ACDA
+class ACDAConstants
 
 @@acda_userdir 		= ENV["HOME"] + "/.acda"
 @@acda_home    		= "."
@@ -7,16 +7,16 @@ class ACDA
 @@disc_plugins_dir 	= @@acda_home + '/disc_plugins'
 @@acda_config  		= @@acda_userdir + '/acda.cfg'
 
-def ACDA.input_types()
+def ACDAConstants.input_types()
     types = Hash.new
     types['Title'] = StringType.new("Title")
     types['Description'] = StringType.new("Title")
     return types
 end
 
-def ACDA.default_types()
+def ACDAConstants.default_types()
     types = Hash.new
-    types.merge!(ACDA.input_types())
+    types.merge!(ACDAConstants.input_types())
     types['Number'] = NumberType.new("Number")
     types['Scanned'] = BoolType.new("Scanned")
     types['AddingDate'] = DateType.new("AddingDate")
@@ -26,23 +26,23 @@ def ACDA.default_types()
     return types
 end
 
-def ACDA.acda_userdir
+def ACDAConstants.acda_userdir
 	@@acda_userdir
 end
 
-def ACDA.acda_home
+def ACDAConstants.acda_home
 	@@acda_home
 end
 
-def ACDA.data_plugins_dir
+def ACDAConstants.data_plugins_dir
 	@@data_plugins_dir
 end
 
-def ACDA.disc_plugins_dir
+def ACDAConstants.disc_plugins_dir
 	@@disc_plugins_dir
 end
 
-def ACDA.acda_config
+def ACDAConstants.acda_config
 	@@acda_config
 end
 

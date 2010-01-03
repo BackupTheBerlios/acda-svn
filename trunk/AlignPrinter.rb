@@ -3,7 +3,7 @@ class Separator
 end
 
 class AlignPrinter
-attr_accessor :width, :vseparator
+attr_accessor :width, :vseparator, :value_separator
 
 def initialize(max = 30)
     @directOutput = true
@@ -12,6 +12,7 @@ def initialize(max = 30)
     @lines      = []
     @max        = max
     @vseparator = "---\n"
+    @value_separator = ' '
 end
 
 def set_captions(captions)
@@ -47,7 +48,7 @@ def print_line(line)
 
     i = 0
     line.each { |entry|
-        print entry.to_s.ljust(@width[i]), ' '
+        print entry.to_s.ljust(@width[i]), @value_separator
         i += 1
     }
     puts
@@ -56,9 +57,14 @@ end
 def flush()
     if @captions.size > 0
        print_line(@captions)
-       puts "-" * 60
+       puts "-" * output_width()
     end
 
     @lines.each { |line| print_line(line) }
 end
+
+def output_width()
+  return @width.inject { |sum,width| sum + width + @value_separator.size }
+end
+
 end

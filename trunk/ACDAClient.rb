@@ -95,6 +95,14 @@ def get_disc(number)
   return discs.find { |disc| disc.number == number }
 end
 
+def get_files(disc_number)
+  unless @storage
+    raise NotInitializedError, "Client not initialized, call load_config first."
+  end
+  disc = get_disc(disc_number)
+  return @storage.getFiles(disc_number)
+end
+
 def new_disc()
   unless @storage
     raise NotInitializedError, "Client not initialized, call load_config first."
@@ -103,17 +111,31 @@ def new_disc()
   return Disc.new(next_disc_number())
 end
 
-def scan_disc(disc)
+def scan_disc(disc, path = nil)
   unless @storage
     raise NotInitializedError, "Client not initialized, call load_config first."
   end
 
+  unless path
+    path = @config.values['disc_dir']
+  end
+
+  unless path
+    raise ACDAArgumentError, "No path specified to parse the disc, add a path argument or configure 'disc_dir' in ~/.acda/acda.cfg."
+  end
+  unless File.directory?(path)
+    raise ACDAArgumentError, "The path '#{path}' must be a directory."
+  end
+  unless File.readable?(path)
+    raise ACDAArgumentError, "The path '#{path}' must be readable."
+  end
+
   DiscPlugins.add_disc(disc)
-  DiscPlugins.scan_disc(disc, '/tmp')
+  DiscPlugins.scan_disc(disc, path)
 
   parser = DiscParser.new
   parser.disc = disc
-  parser.parse('/tmp')
+  parser.parse(path)
 
   disc.add_value(Value.new(StringType.new("Title"), parser.root.name))
   disc.root = parser.root
@@ -130,6 +152,14 @@ def add_disc(disc)
   
   @storage.setDisc(disc)
   @storage.setFiles(disc.number, disc.root) unless disc.root == nil
+  @storage.flush()
+end
+
+def rem_disc(number)
+  unless @storage
+    raise NotInitializedError, "Client not initialized, call load_config first."
+  end
+  @storage.remDisc(number)
   @storage.flush()
 end
 

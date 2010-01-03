@@ -10,7 +10,7 @@ class ACDAConfig
 	attr_accessor :keys
 
 	def initialize(path, keys = nil)
-		@keys = %w#plugin_dir plugin plugin_param disc_plugin_dir#
+		@keys = %w#disc_dir plugin_dir plugin plugin_param disc_plugin_dir#
 
 		@path   = path
 		@values = Hash.new
